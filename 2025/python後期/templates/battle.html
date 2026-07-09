@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+<h1>RPGの戦闘フォーム</h1>
+<p>{{ message }}</p>
+<form action="/result" method="post">
+  <select name="name">
+    {% for player in players %}
+      <option value="{{player}}">{{player}}</option>
+    {% endfor %}
+  </select>
+    <button type="submit">たたかう</button>
+</form>
+{% endblock %}
+

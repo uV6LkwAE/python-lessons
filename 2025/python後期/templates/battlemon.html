@@ -1,0 +1,194 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+  <style>
+    table { 
+      border-collapse: collapse; 
+      margin-top: 20px;
+      margin-bottom: 20px; }
+    th, td { 
+      border: 1px solid #555; 
+      padding: 6px 12px; 
+      text-align: center; }
+    /* th { 
+      background-color: #eee; } */
+  </style>
+
+  {% if names %}
+  <table>
+    <tr>
+      <th>名前</th>
+      <th>HP</th>
+      <th>MP</th>
+      <th>ATK</th>
+      <th>DEF</th>
+      <th>SPD</th>
+      <th>MAG</th>
+      <th>LV</th>
+      <th>ODDS</th>
+    </tr>
+    {% for name, stats in monster.items() %}
+    <tr>
+      <td>{{ name }}</td>
+      <td>{{ stats.HP }}</td>
+      <td>{{ stats.MP }}</td>
+      <td>{{ stats.ATK }}</td>
+      <td>{{ stats.DEF }}</td>
+      <td>{{ stats.SPD }}</td>
+      <td>{{ stats.MAG }}</td>
+      <td>{{ stats.LV }}</td>
+      <td>{{ stats.odds }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <form action="/action" methods="get">
+    <label>賭け対象のモンスター</label>
+    <select name="choise">
+      {% for name in names %}
+      <option value="{{ name }}">{{ name }}</option>
+      {% endfor %}
+    </select>
+    
+    <p></p>
+    <label for="bet">賭け金</label>
+    <input type="text" name="bet">
+
+    <p></p>
+    <button type="submit">戦闘開始</button>
+  </form>
+  {% endif %}
+
+
+
+  {% if fin == true %}
+  <p>{{turn}}ターン目</p>
+  <form action="/result">
+    <table>
+      <tr>
+        <th>名前</th>
+        <th>HP</th>
+        <th>MP</th>
+        <th>ATK</th>
+        <th>DEF</th>
+        <th>SPD</th>
+        <th>MAG</th>
+        <th>LV</th>
+        <th>ODDS</th>
+      </tr>
+      {% for name, stats in monster.items() %}
+      <tr>
+        <td>{{ name }}</td>
+        <td>{{ stats.HP }}</td>
+        <td>{{ stats.MP }}</td>
+        <td>{{ stats.ATK }}</td>
+        <td>{{ stats.DEF }}</td>
+        <td>{{ stats.SPD }}</td>
+        <td>{{ stats.MAG }}</td>
+        <td>{{ stats.LV }}</td>
+        <td>{{ stats.odds }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {{move}}
+    <p></p>
+    <button type="submit"> {{message}} </button>
+  </form>
+
+  {% elif actions %}
+  <p>{{turn}}ターン目</p>
+  <table>
+    <tr>
+      <th>名前</th>
+      <th>HP</th>
+      <th>MP</th>
+      <th>ATK</th>
+      <th>DEF</th>
+      <th>SPD</th>
+      <th>MAG</th>
+      <th>LV</th>
+      <th>ODDS</th>
+    </tr>
+    {% for name, stats in monster.items() %}
+    <tr>
+      <td>{{ name }}</td>
+      <td>{{ stats.HP }}</td>
+      <td>{{ stats.MP }}</td>
+      <td>{{ stats.ATK }}</td>
+      <td>{{ stats.DEF }}</td>
+      <td>{{ stats.SPD }}</td>
+      <td>{{ stats.MAG }}</td>
+      <td>{{ stats.LV }}</td>
+      <td>{{ stats.odds }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p></p>
+  <form action="/move"  method="get">
+    <select name="mov">
+      {% for index, action in actions.items() %}
+      <option value="{{ index }}">{{action}}</option>
+      {% endfor %}
+    </select>
+    <button type="submit">実行する</button>
+  </form>
+
+  {% else %}
+  <!-- {% elif fin == false %} -->
+  <p>{{turn}}ターン目</p>
+  <form action="/action">
+    <table>
+      <tr>
+        <th>名前</th>
+        <th>HP</th>
+        <th>MP</th>
+        <th>ATK</th>
+        <th>DEF</th>
+        <th>SPD</th>
+        <th>MAG</th>
+        <th>LV</th>
+        <th>ODDS</th>
+      </tr>
+      {% for name, stats in monster.items() %}
+      <tr>
+        <td>{{ name }}</td>
+        <td>{{ stats.HP }}</td>
+        <td>{{ stats.MP }}</td>
+        <td>{{ stats.ATK }}</td>
+        <td>{{ stats.DEF }}</td>
+        <td>{{ stats.SPD }}</td>
+        <td>{{ stats.MAG }}</td>
+        <td>{{ stats.LV }}</td>
+        <td>{{ stats.odds }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    
+    {% if move %}
+      {{move}}
+    {% endif %}
+    <p></p>
+    <button type="submit"> {{message}} </button>
+  </form>
+
+  {% endif %}
+
+  {{choise}}
+  {{bet}}
+
+  {% if last_monster %}
+  <h2>{{message}}</h2>
+
+  <h3>勝利したモンスター：{{ winner }}</h3>
+
+  <!-- {{last_monster}} -->
+  <p>あなたが賭けたモンスター：{{choise}}</p>
+  <p>賭けた額：{{bet}}</p>
+
+  {% endif %}
+
+  {% if success %}
+  <p>賭けに成功しました！{{success}}チップ獲得！</p>
+  {% endif %}
+
+{% endblock %}
