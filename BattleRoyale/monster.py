@@ -2,8 +2,7 @@
 課題: バトルロワイヤルを関数ベースで実装する
 クラスは用いず、関数で実装することを身につける
 
-注意: 現段階では実際にレベルが引かれておらず、最後の一体になるまでモンスターを倒せない
-まずはここまで実装している
+注意: まずは基本実装のため、クリティカルダメージは戦闘に組み込んでいない
 
 要件:
 - 任意のモンスターを用意し、それぞれHPなどの属性を持つ
@@ -89,6 +88,17 @@
    - 渡すもの: attacker, defender, damage, remaining_hp
    - 返すもの: なし
    - 処理内容: 攻撃者、防御者、ダメージ、残りHPを表示する
+
+10. バトルロワイヤル: battle_royale(monsters)
+   - 渡すもの: monsters 辞書
+   - 返すもの: なし
+   - 処理内容: 最後の一体になるまで攻撃処理を繰り返し、勝者を表示する
+
+11. メイン処理: main()
+   - 渡すもの: なし
+   - 返すもの: なし
+   - 処理内容: モンスター生成、オッズ設定、初期状態表示、
+     バトルロワイヤル開始までを順番に実行する
 """
 
 import random
@@ -146,7 +156,8 @@ def can_avoid(monsters, defender):
 
 # 防御側のHPからダメージを引く
 def apply_damage(monsters, defender, damage):
-    monsters[defender]["HP"] -= damage
+    # ダメージを引いた後、マイナスにならないようにする
+    monsters[defender]["HP"] = max(0, monsters[defender]["HP"] - damage)
     return monsters[defender]["HP"]
 
 
@@ -155,6 +166,19 @@ def print_battle_message(attacker, defender, damage, remaining_hp):
     print(f"{attacker} の攻撃")
     print(f"{defender} に {damage} ダメージ")
     print(f"{defender} の残りHP: {remaining_hp}")
+
+
+# HPが0以下になったモンスターを戦闘不能として取り除く
+def remove_defeated_monsters(monsters):
+    defeated_monsters = []
+
+    for monster_name in list(monsters.keys()):
+        if monsters[monster_name]["HP"] <= 0:
+            defeated_monsters.append(monster_name)
+
+    for monster_name in defeated_monsters:
+        del monsters[monster_name]
+        print(f"{monster_name} はHPが0になり、戦闘不能になりました")
 
 
 def create_monsters():
@@ -184,7 +208,6 @@ def build_odds(monsters):
 
     # レベルの降順に並び替える
     odds.sort(reverse=True)
-    print(odds)
     return odds
 
 
@@ -241,32 +264,45 @@ def assign_odds(monsters, odds):
         index = next_index
 
 
+# 最後の一体になるまで、1回分の攻撃処理を繰り返す
+def battle_royale(monsters):
+    while len(monsters) > 1:
+        attacker, defender = choose_attacker_and_defender(monsters)
+
+        if can_avoid(monsters, defender):
+            print(f"{attacker} の攻撃")
+            print(f"{defender} は攻撃を回避しました")
+        else:
+            damage = calculate_damage(monsters, attacker, defender)
+            remaining_hp = apply_damage(monsters, defender, damage)
+            print_battle_message(attacker, defender, damage, remaining_hp)
+
+        remove_defeated_monsters(monsters)
+        print()
+
+    winner = list(monsters.keys())[0]
+    print(f"{winner} の勝利です")
+
+
 def main():
-    # 関数内部からモンスター生成関数を呼び出しても良い
     monsters = create_monsters()
     odds = build_odds(monsters)
     assign_odds(monsters, odds)
 
-    for name, stats in monsters.items():
-        print(name, stats)
+    print("参加モンスター")
+    for monster_name, stats in monsters.items():
+        print(
+            f"{monster_name}: "
+            f"HP={stats['HP']} "
+            f"ATK={stats['ATK']} "
+            f"DEF={stats['DEF']} "
+            f"SPD={stats['SPD']} "
+            f"lv={stats['lv']} "
+            f"odds={stats['odds']}"
+        )
+    print()
 
-    attacker, defender = choose_attacker_and_defender(monsters)
-
-    print("attacker =", attacker, "defender =", defender)
-    if can_avoid(monsters, defender):
-        print(f"{attacker} の攻撃")
-        print(f"{defender} は攻撃を回避しました")
-    else:
-        damage = calculate_damage(monsters, attacker, defender)
-        remaining_hp = apply_damage(monsters, defender, damage)
-        print_battle_message(attacker, defender, damage, remaining_hp)
-
-    print("critical_dmg =", calculate_critical_damage(monsters, attacker))
-
-    defender_speed = monsters[defender]["SPD"]
-    can_defender_avoid = can_avoid(monsters, defender)
-    print(defender, "SPD = ", defender_speed)
-    print("can_avoid =", can_defender_avoid)
+    battle_royale(monsters)
 
 
 if __name__ == "__main__":
