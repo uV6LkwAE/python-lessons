@@ -26,6 +26,9 @@
   このプログラムでは、防御側の DEF を使わず、
   攻撃側の ATK をもとに計算する
 - 防御側の SPD が45以上なら、回避可能なモンスターとして扱う
+- ダメージが決まったら、防御側のHPからダメージ分を引く
+- 攻撃者、防御者、ダメージ、残りHPを
+  戦闘メッセージとして表示する
 
 オッズ仕様:
 - オッズは、勝ったときにどれくらいの倍率になるかを表す
@@ -92,6 +95,19 @@ def calculate_critical_damage(monsters, attacker):
 def can_avoid(monsters, defender):
     speed = monsters[defender]["SPD"]
     return speed >= 45
+
+
+# 防御側のHPからダメージを引く
+def apply_damage(monsters, defender, damage):
+    monsters[defender]["HP"] -= damage
+    return monsters[defender]["HP"]
+
+
+# 1回分の戦闘結果を表示する
+def print_battle_message(attacker, defender, damage, remaining_hp):
+    print(f"{attacker} の攻撃")
+    print(f"{defender} に {damage} ダメージ")
+    print(f"{defender} の残りHP: {remaining_hp}")
 
 
 def create_monsters():
@@ -190,7 +206,14 @@ def main():
     attacker, defender = choose_attacker_and_defender(monsters)
 
     print("attacker =", attacker, "defender =", defender)
-    print("damage =", calculate_damage(monsters, attacker, defender))
+    if can_avoid(monsters, defender):
+        print(f"{attacker} の攻撃")
+        print(f"{defender} は攻撃を回避しました")
+    else:
+        damage = calculate_damage(monsters, attacker, defender)
+        remaining_hp = apply_damage(monsters, defender, damage)
+        print_battle_message(attacker, defender, damage, remaining_hp)
+
     print("critical_dmg =", calculate_critical_damage(monsters, attacker))
 
     defender_speed = monsters[defender]["SPD"]
