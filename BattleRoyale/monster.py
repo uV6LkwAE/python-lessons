@@ -42,6 +42,53 @@
 - 最も強いグループのオッズは2から始める
 - 同じ lv のモンスターが複数いる場合は、同じオッズを付ける
 - 同じ lv のグループには、その順位範囲の平均値をオッズとして使う
+
+実装順と関数仕様:
+1. モンスター生成: create_monsters()
+   - 渡すもの: なし
+   - 返すもの: monsters 辞書
+   - 処理内容: 各モンスターに HP, MP, ATK, DEF, SPD, MAG を設定する
+
+2. レベル設定: create_monsters() 内の lv 計算
+   - 渡すもの: 各モンスターのステータス
+   - 返すもの: なし
+   - 処理内容: ステータス合計を10で割り、lv として保存する
+
+3. オッズ用リスト作成: build_odds(monsters)
+   - 渡すもの: monsters 辞書
+   - 返すもの: odds リスト
+   - 処理内容: (lv, モンスター名) のタプルを作り、lv の降順に並べる
+
+4. オッズ設定: assign_odds(monsters, odds)
+   - 渡すもの: monsters 辞書, odds リスト
+   - 返すもの: なし
+   - 処理内容: lv が高いほど低いオッズを付ける
+
+5. 攻防判定: choose_attacker_and_defender(monsters)
+   - 渡すもの: monsters 辞書
+   - 返すもの: attacker, defender
+   - 処理内容: 攻撃側と防御側をランダムに1体ずつ選ぶ
+
+6. 回避判定: can_avoid(monsters, defender)
+   - 渡すもの: monsters 辞書, defender
+   - 返すもの: True または False
+   - 処理内容: defender の SPD が45以上なら回避できると判定する
+
+7. ダメージ計算: calculate_damage(monsters, attacker, defender)
+   - 渡すもの: monsters 辞書, attacker, defender
+   - 返すもの: damage
+   - 処理内容: attacker の ATK と defender の DEF から通常ダメージを計算する
+
+8. HP減算: apply_damage(monsters, defender, damage)
+   - 渡すもの: monsters 辞書, defender, damage
+   - 返すもの: remaining_hp
+   - 処理内容: defender の HP から damage を引く
+
+9. 戦闘メッセージ出力:
+   print_battle_message(attacker, defender, damage, remaining_hp)
+   - 渡すもの: attacker, defender, damage, remaining_hp
+   - 返すもの: なし
+   - 処理内容: 攻撃者、防御者、ダメージ、残りHPを表示する
 """
 
 import random
