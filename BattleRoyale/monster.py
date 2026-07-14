@@ -131,6 +131,7 @@ def assign_odds(monsters, odds):
     odds_rank = 2
     index = 0
 
+    # 全てのodds分、ループで回す
     while index < len(odds):
         # タプルのレベルだけ取り出す
         current_level = odds[index][0]
@@ -142,6 +143,8 @@ def assign_odds(monsters, odds):
         # 次のレベルが今見ているレベルと同じか確認する
         # 両方満たしていればTrue
         # 前半はnext_indexがoddsの範囲を超えないようにするため必要
+
+        # 今見ているレベルと同じレベルが続いている間、同じグループとして集める
         while next_index < len(odds) and odds[next_index][0] == current_level:
             same_level_names.append(odds[next_index][1])
             next_index += 1
